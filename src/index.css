@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.btn-red{
+    @apply bg-red-500 hover:bg-red-600 border-0
+}
+
+.btn-shape{
+    clip-path: polygon(11% 2%, 89% 2%, 100% 100%, 0% 100%);
+}
+
+
+
+
+
