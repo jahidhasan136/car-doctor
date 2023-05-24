@@ -6,7 +6,7 @@ import { AuthContext } from '../Providers/AuthProvider';
 
 const Login = () => {
 
-    const { login, user } = useContext(AuthContext)
+    const { login, googleSignIn } = useContext(AuthContext)
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
     const navigate = useNavigate();
@@ -22,27 +22,24 @@ const Login = () => {
         login(email, password)
             .then(result => {
                 const loginUser = result.user
+                console.log(loginUser)
+                navigate(from, {replace: true })
                 
-                const loggedUser = {
-                    email: result.user.email
-                }
-                fetch('http://localhost:5000/jwt',{
-                    method: 'POST',
-                    headers: {
-                        'content-type': 'applicaiton/json'
-                    },
-                    body: JSON.stringify(loggedUser)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    console.log(data)
-                    localStorage.setItem('car-access-token', data.token)
-                    navigate(from, {replace: true })
-                })
+                
             })
             .catch(error => {
                 console.error(error.message)
             })
+    }
+
+    const handleGoogle = () => {
+        googleSignIn()
+        .then(result => {
+            console.log(result)
+        })
+        .catch(error=>{
+            console.log(error)
+        })
     }
 
     return (
@@ -75,7 +72,7 @@ const Login = () => {
                         <div className='flex justify-center mt-3 gap-4 text-2xl'>
                             <FaFacebookF className='text-indigo-700 border rounded-full w-10 p-2 h-10' ></FaFacebookF>
                             <FaLinkedinIn className='text-sky-600 border rounded-full w-10 p-2 h-10'></FaLinkedinIn>
-                            <FaGoogle className='text-indigo-500 border rounded-full w-10 p-2 h-10'></FaGoogle>
+                            <FaGoogle onClick={handleGoogle} className='text-indigo-500 border rounded-full w-10 p-2 h-10'></FaGoogle>
                         </div>
                         <h3 className=' font-bold text-center mt-3 text-sm'><span className='text-gray-500'>Have an account?</span> <Link to="/signup"><span className='text-red-500'>Sing Up</span></Link></h3>
                     </div>

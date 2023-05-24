@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import app from "../../firebase/firebase.config";
 import { createContext, useEffect, useState } from "react";
 
@@ -10,6 +10,7 @@ const AuthProvider = ({ children }) => {
     const auth = getAuth(app);
     const [user, setUser] = useState(null)
     const [loader, setLoader] = useState(true)
+    const googleProvider = new GoogleAuthProvider()
 
 
     const createUser = (email, password) => {
@@ -22,11 +23,37 @@ const AuthProvider = ({ children }) => {
         return signInWithEmailAndPassword(auth, email, password)
     }
 
-    
+    const googleSignIn = () => {
+        setLoader(true)
+        return signInWithPopup(auth, googleProvider)
+    }
+
+
     useEffect(() => {
         const unSubscribe = onAuthStateChanged(auth, currentUser => {
             setUser(currentUser)
             setLoader(false)
+            if (currentUser && currentUser.email) {
+                const loggedUser = {
+                    email: currentUser.email
+                }
+                fetch('http://localhost:5000/jwt', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'applicaiton/json'
+                    },
+                    body: JSON.stringify(loggedUser)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data)
+                        localStorage.setItem('car-access-token', data.token)
+                    })
+            }
+            else {
+                localStorage.removeItem('car-access-token')
+
+            }
         })
         return () => {
             unSubscribe()
@@ -43,6 +70,7 @@ const AuthProvider = ({ children }) => {
         loader,
         createUser,
         login,
+        googleSignIn,
         logOut
     }
 
