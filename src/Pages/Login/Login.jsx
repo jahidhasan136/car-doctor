@@ -6,7 +6,7 @@ import { AuthContext } from '../Providers/AuthProvider';
 
 const Login = () => {
 
-    const { login } = useContext(AuthContext)
+    const { login, user } = useContext(AuthContext)
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
     const navigate = useNavigate();
@@ -22,8 +22,21 @@ const Login = () => {
         login(email, password)
             .then(result => {
                 const loginUser = result.user
-                console.log(loginUser)
-                navigate(from, {replace: true })
+                // navigate(from, {replace: true })
+                const loggedUser = {
+                    email: result.user.email
+                }
+                fetch('http://localhost:5000/jwt',{
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'applicaiton/json'
+                    },
+                    body: JSON.stringify(loggedUser)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data)
+                })
             })
             .catch(error => {
                 console.error(error.message)
