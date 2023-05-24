@@ -22,7 +22,7 @@ const Login = () => {
         login(email, password)
             .then(result => {
                 const loginUser = result.user
-                // navigate(from, {replace: true })
+                
                 const loggedUser = {
                     email: result.user.email
                 }
@@ -36,6 +36,8 @@ const Login = () => {
                 .then(res => res.json())
                 .then(data => {
                     console.log(data)
+                    localStorage.setItem('car-access-token', data.token)
+                    navigate(from, {replace: true })
                 })
             })
             .catch(error => {
